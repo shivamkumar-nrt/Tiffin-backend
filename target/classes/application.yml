@@ -1,0 +1,57 @@
+﻿server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: tiffin-service-backend
+
+  datasource:
+    url: jdbc:h2:file:./data/tiffindb;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE
+    driverClassName: org.h2.Driver
+    username: sa
+    password: 
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  cache:
+    type: simple # defaults to in-memory Spring Cache, seamlessly upgradable to redis
+    cache-names:
+      - menus
+      - prices
+      - dashboardStats
+      - userBalances
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2000ms
+
+tiffin:
+  app:
+    jwtSecret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    jwtExpirationMs: 86400000 # 24 hours
+    currencySymbol: "Rs."
+    defaultFullPrice: 120.00
+    defaultHalfPrice: 80.00
+
+logging:
+  level:
+    root: INFO
+    com.tiffin.system: DEBUG
