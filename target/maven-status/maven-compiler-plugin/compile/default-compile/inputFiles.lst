@@ -1,6 +1,7 @@
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\config\CacheConfig.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\config\DataInitializer.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\config\SecurityConfig.java
+E:\Tiffin system\backend\src\main\java\com\tiffin\system\config\SimpleCorsFilter.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\config\WebConfig.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\controller\AuditLogController.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\controller\AuthController.java
