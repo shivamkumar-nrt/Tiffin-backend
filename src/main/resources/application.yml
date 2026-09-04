@@ -15,13 +15,12 @@ spring:
 
   h2:
     console:
-      enabled: ${H2_CONSOLE_ENABLED:true}
+      enabled: ${H2_CONSOLE_ENABLED:false}
       path: /h2-console
       settings:
         web-allow-others: true
 
   jpa:
-    database-platform: ${SPRING_JPA_DATABASE_PLATFORM:org.hibernate.dialect.H2Dialect}
     hibernate:
       ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
     show-sql: false
@@ -30,18 +29,12 @@ spring:
         format_sql: false
 
   cache:
-    type: simple # defaults to in-memory Spring Cache, seamlessly upgradable to redis
+    type: simple
     cache-names:
       - menus
       - prices
       - dashboardStats
       - userBalances
-
-  data:
-    redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      timeout: 2000ms
 
 tiffin:
   app:
@@ -54,4 +47,4 @@ tiffin:
 logging:
   level:
     root: INFO
-    com.tiffin.system: DEBUG
+    com.tiffin.system: INFO
