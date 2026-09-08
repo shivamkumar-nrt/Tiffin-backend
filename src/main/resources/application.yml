@@ -26,7 +26,6 @@ spring:
     show-sql: false
     properties:
       hibernate:
-        dialect: ${HIBERNATE_DIALECT:org.hibernate.dialect.PostgreSQLDialect}
         format_sql: false
         jdbc:
           lob:
