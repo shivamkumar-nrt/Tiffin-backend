@@ -1,0 +1,15 @@
+﻿services:
+  - type: web
+    name: tiffin-service-backend
+    env: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    autoDeploy: true
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: SPRING_CACHE_TYPE
+        value: none
