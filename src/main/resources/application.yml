@@ -9,9 +9,8 @@ spring:
 
   datasource:
     url: ${SPRING_DATASOURCE_URL:${DATABASE_URL:jdbc:h2:file:./data/tiffindb;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE}}
-    driverClassName: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:org.h2.Driver}
-    username: ${SPRING_DATASOURCE_USERNAME:sa}
-    password: ${SPRING_DATASOURCE_PASSWORD:}
+    username: ${SPRING_DATASOURCE_USERNAME:${DATABASE_USERNAME:sa}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${DATABASE_PASSWORD:}}
 
   h2:
     console:
@@ -21,13 +20,11 @@ spring:
         web-allow-others: true
 
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
     show-sql: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.H2Dialect
         format_sql: false
         jdbc:
           lob:
