@@ -22,8 +22,11 @@ public class PaymentDto {
     private String userEmail;
     private BigDecimal amount;
     private PaymentMethod paymentMethod;
+    private String paymentApp;
+    private java.time.LocalDate paymentDate;
     private String transactionRef;
     private String notes;
+    private String rejectionReason;
     private PaymentStatus status;
     private String verifiedBy;
     private LocalDateTime verifiedAt;

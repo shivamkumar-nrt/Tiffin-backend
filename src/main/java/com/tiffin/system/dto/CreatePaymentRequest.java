@@ -19,6 +19,8 @@ public class CreatePaymentRequest {
     @NotNull(message = "Payment method is required")
     private PaymentMethod paymentMethod;
 
+    private String paymentApp;
+    private java.time.LocalDate paymentDate;
     private String transactionRef;
     private String notes;
     private boolean markAsSuccess = true; // For admin convenience

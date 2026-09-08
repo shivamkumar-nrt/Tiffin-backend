@@ -44,6 +44,7 @@ com\tiffin\system\dto\InvoiceItemDto.class
 com\tiffin\system\entity\MenuItem.class
 com\tiffin\system\service\ComboService.class
 com\tiffin\system\service\impl\UserServiceImpl.class
+com\tiffin\system\config\SimpleCorsFilter.class
 com\tiffin\system\controller\ComboController.class
 com\tiffin\system\entity\enums\PaymentStatus.class
 com\tiffin\system\dto\RegisterRequest.class
@@ -94,6 +95,7 @@ com\tiffin\system\controller\PaymentController.class
 com\tiffin\system\service\PaymentService.class
 com\tiffin\system\entity\MenuItem$MenuItemBuilder.class
 com\tiffin\system\dto\MenuItemDto$MenuItemDtoBuilder.class
+com\tiffin\system\config\CacheConfig$1.class
 com\tiffin\system\dto\TiffinRecordDto.class
 com\tiffin\system\entity\PriceConfig$PriceConfigBuilder.class
 com\tiffin\system\security\jwt\JwtUtils.class

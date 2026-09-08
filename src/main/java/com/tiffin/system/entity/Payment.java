@@ -44,8 +44,16 @@ public class Payment {
     @Column(length = 100)
     private String transactionRef;
 
+    private java.time.LocalDate paymentDate;
+
+    @Column(length = 100)
+    private String paymentApp;
+
     @Column(length = 500)
     private String notes;
+
+    @Column(length = 500)
+    private String rejectionReason;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)

@@ -2,6 +2,7 @@ package com.tiffin.system.service.impl;
 
 import com.tiffin.system.dto.CreatePaymentRequest;
 import com.tiffin.system.dto.PaymentDto;
+import com.tiffin.system.dto.SubmitPaymentRequest;
 import com.tiffin.system.entity.*;
 import com.tiffin.system.entity.enums.PaymentStatus;
 import com.tiffin.system.entity.enums.RecordStatus;
@@ -48,6 +49,8 @@ public class PaymentServiceImpl implements PaymentService {
                 .user(user)
                 .amount(request.getAmount())
                 .paymentMethod(request.getPaymentMethod())
+                .paymentApp(request.getPaymentApp())
+                .paymentDate(request.getPaymentDate() != null ? request.getPaymentDate() : LocalDate.now())
                 .transactionRef(request.getTransactionRef())
                 .notes(request.getNotes())
                 .status(request.isMarkAsSuccess() ? PaymentStatus.SUCCESS : PaymentStatus.PENDING_VERIFICATION)
@@ -69,6 +72,34 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional
+    public PaymentDto submitCustomerPayment(SubmitPaymentRequest request, String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + userEmail));
+
+        String paymentNumber = "PAY-" + LocalDate.now().format(NUM_DATE_FMT) + "-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+
+        Payment payment = Payment.builder()
+                .paymentNumber(paymentNumber)
+                .user(user)
+                .amount(request.getAmount())
+                .paymentMethod(request.getPaymentMethod())
+                .paymentApp(request.getPaymentApp())
+                .paymentDate(request.getPaymentDate() != null ? request.getPaymentDate() : LocalDate.now())
+                .transactionRef(request.getTransactionRef())
+                .notes(request.getNotes())
+                .status(PaymentStatus.PENDING_VERIFICATION)
+                .build();
+
+        Payment savedPayment = paymentRepository.save(payment);
+
+        auditService.logAction("SUBMIT_PAYMENT", "Payment", savedPayment.getId().toString(), userEmail,
+                "Customer submitted settlement payment of Rs. " + savedPayment.getAmount() + " (UTR: " + savedPayment.getTransactionRef() + ", App: " + savedPayment.getPaymentApp() + ")");
+
+        return mapToDto(savedPayment);
+    }
+
+    @Override
+    @Transactional
     public PaymentDto markPaymentSuccess(Long paymentId, String adminEmail) {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Payment not found with id: " + paymentId));
@@ -78,6 +109,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         payment.setStatus(PaymentStatus.SUCCESS);
+        payment.setRejectionReason(null);
         payment.setVerifiedBy(adminEmail);
         payment.setVerifiedAt(LocalDateTime.now());
         Payment savedPayment = paymentRepository.save(payment);
@@ -85,9 +117,78 @@ public class PaymentServiceImpl implements PaymentService {
         settleRecordsAndCreateInvoice(savedPayment, adminEmail);
 
         auditService.logAction("VERIFY_PAYMENT", "Payment", paymentId.toString(), adminEmail,
-                "Verified and confirmed payment " + payment.getPaymentNumber() + " of Rs. " + payment.getAmount());
+                "Verified and approved payment " + payment.getPaymentNumber() + " of Rs. " + payment.getAmount());
 
         return mapToDto(savedPayment);
+    }
+
+    @Override
+    @Transactional
+    public PaymentDto rejectPayment(Long paymentId, String rejectionReason, String adminEmail) {
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Payment not found with id: " + paymentId));
+
+        if (payment.getStatus() == PaymentStatus.SUCCESS) {
+            throw new BadRequestException("Cannot reject an already verified and settled payment");
+        }
+
+        payment.setStatus(PaymentStatus.FAILED);
+        payment.setRejectionReason(rejectionReason);
+        payment.setVerifiedBy(adminEmail);
+        payment.setVerifiedAt(LocalDateTime.now());
+        Payment savedPayment = paymentRepository.save(payment);
+
+        auditService.logAction("REJECT_PAYMENT", "Payment", paymentId.toString(), adminEmail,
+                "Rejected payment " + payment.getPaymentNumber() + ". Reason: " + rejectionReason);
+
+        return mapToDto(savedPayment);
+    }
+
+    @Override
+    public Map<String, Object> getReminderStatus() {
+        LocalDate today = LocalDate.now();
+        int day = today.getDayOfMonth();
+        int lastDay = today.lengthOfMonth();
+        boolean isReminderWindow = day >= 25 && day <= lastDay;
+
+        Map<String, Object> status = new HashMap<>();
+        status.put("active", isReminderWindow);
+        status.put("dayOfMonth", day);
+        status.put("lastDayOfMonth", lastDay);
+        status.put("daysLeftInMonth", Math.max(0, lastDay - day));
+        status.put("message", isReminderWindow
+                ? "Monthly payment settlement reminder window is active (25th to month-end). Please settle all pending dues."
+                : "Payment settlement reminder window will activate from 25th of the month.");
+        return status;
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> sendBulkPaymentReminders(String triggerSource) {
+        // Find all active unpaid records count
+        List<TiffinRecord> unpaidRecords = tiffinRecordRepository.findAll().stream()
+                .filter(r -> r.getStatus() == RecordStatus.UNPAID)
+                .collect(Collectors.toList());
+
+        Set<Long> userIdsWithDues = unpaidRecords.stream()
+                .map(r -> r.getUser().getId())
+                .collect(Collectors.toSet());
+
+        BigDecimal totalDue = unpaidRecords.stream()
+                .map(TiffinRecord::getChargedAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        auditService.logAction("BULK_PAYMENT_REMINDER", "System", "REMINDERS", triggerSource,
+                "Sent payment reminders to " + userIdsWithDues.size() + " customers with total pending dues of Rs. " + totalDue);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", true);
+        result.put("customersReminded", userIdsWithDues.size());
+        result.put("totalPendingDue", totalDue);
+        result.put("triggeredBy", triggerSource);
+        result.put("timestamp", LocalDateTime.now());
+        result.put("message", "Payment reminders dispatched successfully to " + userIdsWithDues.size() + " customers.");
+        return result;
     }
 
     private void settleRecordsAndCreateInvoice(Payment payment, String actor) {
@@ -98,7 +199,6 @@ public class PaymentServiceImpl implements PaymentService {
                 .collect(Collectors.toList());
 
         List<TiffinRecord> settledRecords = new ArrayList<>();
-        BigDecimal remainingAmount = payment.getAmount();
         BigDecimal totalSettledAmount = BigDecimal.ZERO;
 
         for (TiffinRecord record : unpaidRecords) {
@@ -184,8 +284,11 @@ public class PaymentServiceImpl implements PaymentService {
                 .userEmail(pay.getUser().getEmail())
                 .amount(pay.getAmount())
                 .paymentMethod(pay.getPaymentMethod())
+                .paymentApp(pay.getPaymentApp())
+                .paymentDate(pay.getPaymentDate())
                 .transactionRef(pay.getTransactionRef())
                 .notes(pay.getNotes())
+                .rejectionReason(pay.getRejectionReason())
                 .status(pay.getStatus())
                 .verifiedBy(pay.getVerifiedBy())
                 .verifiedAt(pay.getVerifiedAt())
