@@ -31,10 +31,22 @@ spring:
           lob:
             non_contextual_creation: true
 
+  data:
+    redis:
+      host: ${REDIS_HOST:${SPRING_DATA_REDIS_HOST:localhost}}
+      port: ${REDIS_PORT:${SPRING_DATA_REDIS_PORT:6379}}
+      password: ${REDIS_PASSWORD:${SPRING_DATA_REDIS_PASSWORD:}}
+      ssl:
+        enabled: ${REDIS_SSL:false}
+      timeout: 2000ms
+
   cache:
-    type: simple
+    type: ${SPRING_CACHE_TYPE:redis}
     cache-names:
+      - activeCombos
+      - allCombos
       - menus
+      - menuItems
       - prices
       - dashboardStats
       - userBalances

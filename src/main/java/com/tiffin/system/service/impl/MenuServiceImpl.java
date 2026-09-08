@@ -103,6 +103,7 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "menuItems")
     public List<MenuItemDto> getAllMenuItems() {
         return menuItemRepository.findAllByOrderByNameAsc().stream()
                 .map(i -> MenuItemDto.builder()
@@ -118,6 +119,7 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"menuItems", "menus", "dashboardStats"}, allEntries = true)
     public MenuItemDto createMenuItem(MenuItemDto dto, String adminEmail) {
         MenuItem item = MenuItem.builder()
                 .name(dto.getName().trim())
@@ -145,6 +147,7 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"menuItems", "menus", "dashboardStats"}, allEntries = true)
     public void deleteMenuItem(Long id, String adminEmail) {
         MenuItem item = menuItemRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Menu item not found with id: " + id));

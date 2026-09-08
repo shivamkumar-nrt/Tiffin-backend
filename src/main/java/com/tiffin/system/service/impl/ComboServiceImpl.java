@@ -7,6 +7,8 @@ import com.tiffin.system.repository.ComboPackageRepository;
 import com.tiffin.system.service.AuditService;
 import com.tiffin.system.service.ComboService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,7 @@ public class ComboServiceImpl implements ComboService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "allCombos")
     public List<ComboPackageDto> getAllCombos() {
         return comboPackageRepository.findAllByOrderByCreatedAtDesc().stream()
                 .map(this::mapToDto)
@@ -31,6 +34,7 @@ public class ComboServiceImpl implements ComboService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "activeCombos")
     public List<ComboPackageDto> getActiveCombos() {
         return comboPackageRepository.findByIsActiveTrue().stream()
                 .map(this::mapToDto)
@@ -47,6 +51,7 @@ public class ComboServiceImpl implements ComboService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"activeCombos", "allCombos", "dashboardStats"}, allEntries = true)
     public ComboPackageDto createCombo(ComboPackageDto dto, String adminEmail) {
         ComboPackage combo = ComboPackage.builder()
                 .name(dto.getName().trim())
@@ -67,6 +72,7 @@ public class ComboServiceImpl implements ComboService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"activeCombos", "allCombos", "dashboardStats"}, allEntries = true)
     public ComboPackageDto updateCombo(Long id, ComboPackageDto dto, String adminEmail) {
         ComboPackage combo = comboPackageRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Combo package not found with id: " + id));
@@ -88,6 +94,7 @@ public class ComboServiceImpl implements ComboService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"activeCombos", "allCombos", "dashboardStats"}, allEntries = true)
     public void deleteCombo(Long id, String adminEmail) {
         ComboPackage combo = comboPackageRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Combo package not found with id: " + id));
