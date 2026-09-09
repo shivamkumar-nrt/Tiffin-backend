@@ -46,6 +46,15 @@ spring:
           timeout: 5000
           writetimeout: 5000
 
+whatsapp:
+  api:
+    enabled: ${WHATSAPP_API_ENABLED:true}
+    provider: ${WHATSAPP_API_PROVIDER:generic}
+    url: ${WHATSAPP_API_URL:}
+    token: ${WHATSAPP_API_TOKEN:}
+    instance-id: ${WHATSAPP_INSTANCE_ID:}
+    phone-number-id: ${WHATSAPP_PHONE_NUMBER_ID:}
+
   data:
     redis:
       host: ${REDIS_HOST:${SPRING_DATA_REDIS_HOST:localhost}}

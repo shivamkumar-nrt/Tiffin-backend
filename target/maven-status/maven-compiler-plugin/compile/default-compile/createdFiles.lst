@@ -19,6 +19,7 @@ com\tiffin\system\repository\PaymentRepository.class
 com\tiffin\system\entity\Payment.class
 com\tiffin\system\entity\TiffinRecord$TiffinRecordBuilder.class
 com\tiffin\system\entity\AuditLog.class
+com\tiffin\system\service\impl\WhatsAppApiServiceImpl.class
 com\tiffin\system\security\jwt\AuthEntryPointJwt.class
 com\tiffin\system\repository\MenuItemRepository.class
 com\tiffin\system\entity\TiffinRequest.class
@@ -39,6 +40,7 @@ com\tiffin\system\controller\TiffinRecordController.class
 com\tiffin\system\config\SecurityConfig.class
 com\tiffin\system\controller\AuthController.class
 com\tiffin\system\service\impl\AuditServiceImpl.class
+com\tiffin\system\service\WhatsAppApiService.class
 com\tiffin\system\dto\UserDashboardStatsDto.class
 com\tiffin\system\controller\NotificationController.class
 com\tiffin\system\entity\Menu$MenuBuilder.class

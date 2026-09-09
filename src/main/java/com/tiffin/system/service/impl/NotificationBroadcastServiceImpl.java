@@ -15,6 +15,7 @@ import com.tiffin.system.repository.UserRepository;
 import com.tiffin.system.service.AuditService;
 import com.tiffin.system.service.EmailService;
 import com.tiffin.system.service.NotificationBroadcastService;
+import com.tiffin.system.service.WhatsAppApiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ public class NotificationBroadcastServiceImpl implements NotificationBroadcastSe
     private final TiffinRecordRepository tiffinRecordRepository;
     private final BroadcastNotificationRepository broadcastRepository;
     private final EmailService emailService;
+    private final WhatsAppApiService whatsAppApiService;
     private final AuditService auditService;
 
     @Override
@@ -77,7 +79,7 @@ public class NotificationBroadcastServiceImpl implements NotificationBroadcastSe
         if (request.isSendPush()) activeChannels.add("PUSH");
         String channelsStr = String.join(",", activeChannels);
 
-        // 1. Dispatch HTML Emails
+        // 1. Dispatch HTML Emails (Background Auto)
         if (request.isSendEmail()) {
             for (User recipient : recipients) {
                 if (recipient.getEmail() != null && !recipient.getEmail().trim().isEmpty()) {
@@ -87,7 +89,7 @@ public class NotificationBroadcastServiceImpl implements NotificationBroadcastSe
             }
         }
 
-        // 2. Generate WhatsApp 1-Click Links
+        // 2. Dispatch WhatsApp Messages (Background Auto + Links)
         List<Map<String, String>> whatsAppLinks = new ArrayList<>();
         if (request.isSendWhatsApp()) {
             for (User recipient : recipients) {
@@ -101,6 +103,10 @@ public class NotificationBroadcastServiceImpl implements NotificationBroadcastSe
                             + request.getMessage() + "\n\n"
                             + "🍱 _Tiffin Service Management System_";
 
+                    // Background Auto API Dispatch
+                    whatsAppApiService.sendAutoWhatsAppMessage(phoneClean, personalizedText);
+
+                    // Web Link for fallback/preview
                     String encoded = URLEncoder.encode(personalizedText, StandardCharsets.UTF_8);
                     String link = "https://wa.me/" + phoneClean + "?text=" + encoded;
 
