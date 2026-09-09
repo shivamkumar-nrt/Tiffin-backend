@@ -88,6 +88,7 @@ com\tiffin\system\repository\InvoiceRepository.class
 com\tiffin\system\entity\TiffinRequest$TiffinRequestBuilder.class
 com\tiffin\system\dto\CreateTiffinRequest.class
 com\tiffin\system\security\UserDetailsImpl.class
+com\tiffin\system\service\EmailService.class
 com\tiffin\system\repository\UserRepository.class
 com\tiffin\system\service\DashboardService.class
 com\tiffin\system\service\impl\ComboServiceImpl.class

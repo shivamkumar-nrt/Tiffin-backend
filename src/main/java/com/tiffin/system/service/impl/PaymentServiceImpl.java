@@ -33,6 +33,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final TiffinRecordRepository tiffinRecordRepository;
     private final InvoiceRepository invoiceRepository;
     private final AuditService auditService;
+    private final com.tiffin.system.service.EmailService emailService;
 
     private static final DateTimeFormatter NUM_DATE_FMT = DateTimeFormatter.ofPattern("yyyyMMdd");
 
@@ -119,6 +120,13 @@ public class PaymentServiceImpl implements PaymentService {
         auditService.logAction("VERIFY_PAYMENT", "Payment", paymentId.toString(), adminEmail,
                 "Verified and approved payment " + payment.getPaymentNumber() + " of Rs. " + payment.getAmount());
 
+        // Async Email Notification to customer
+        try {
+            emailService.sendPaymentApprovalEmail(savedPayment.getUser(), savedPayment);
+        } catch (Exception e) {
+            // graceful non-blocking
+        }
+
         return mapToDto(savedPayment);
     }
 
@@ -177,6 +185,21 @@ public class PaymentServiceImpl implements PaymentService {
         BigDecimal totalDue = unpaidRecords.stream()
                 .map(TiffinRecord::getChargedAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // Group unpaid records by user and send email reminders
+        Map<User, BigDecimal> userDues = unpaidRecords.stream()
+                .collect(Collectors.groupingBy(
+                        TiffinRecord::getUser,
+                        Collectors.reducing(BigDecimal.ZERO, TiffinRecord::getChargedAmount, BigDecimal::add)
+                ));
+
+        userDues.forEach((u, due) -> {
+            try {
+                emailService.sendPaymentReminderEmail(u, due, "shivamstm01@kotak");
+            } catch (Exception e) {
+                // graceful non-blocking
+            }
+        });
 
         auditService.logAction("BULK_PAYMENT_REMINDER", "System", "REMINDERS", triggerSource,
                 "Sent payment reminders to " + userIdsWithDues.size() + " customers with total pending dues of Rs. " + totalDue);

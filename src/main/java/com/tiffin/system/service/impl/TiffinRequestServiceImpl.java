@@ -47,6 +47,7 @@ public class TiffinRequestServiceImpl implements TiffinRequestService {
     private final MenuService menuService;
     private final PriceService priceService;
     private final AuditService auditService;
+    private final com.tiffin.system.service.EmailService emailService;
 
     @Override
     @Transactional
@@ -166,6 +167,13 @@ public class TiffinRequestServiceImpl implements TiffinRequestService {
         auditService.logAction("APPROVE_TIFFIN_REQUEST", "TiffinRequest", requestId.toString(), adminEmail,
                 "Approved request for " + savedRequest.getUser().getEmail() + " on " + savedRequest.getServiceDate() + " with charged amount Rs. " + chargedAmount);
 
+        // Async Email Notification to customer
+        try {
+            emailService.sendRequestStatusEmail(savedRequest.getUser(), savedRequest);
+        } catch (Exception e) {
+            // graceful non-blocking
+        }
+
         return mapToDto(savedRequest);
     }
 
@@ -187,6 +195,13 @@ public class TiffinRequestServiceImpl implements TiffinRequestService {
 
         auditService.logAction("REJECT_TIFFIN_REQUEST", "TiffinRequest", requestId.toString(), adminEmail,
                 "Rejected request for " + saved.getUser().getEmail() + " on " + saved.getServiceDate() + ". Reason: " + saved.getRejectionReason());
+
+        // Async Email Notification to customer
+        try {
+            emailService.sendRequestStatusEmail(saved.getUser(), saved);
+        } catch (Exception e) {
+            // graceful non-blocking
+        }
 
         return mapToDto(saved);
     }
