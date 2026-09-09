@@ -96,6 +96,15 @@ public class PaymentServiceImpl implements PaymentService {
         auditService.logAction("SUBMIT_PAYMENT", "Payment", savedPayment.getId().toString(), userEmail,
                 "Customer submitted settlement payment of Rs. " + savedPayment.getAmount() + " (UTR: " + savedPayment.getTransactionRef() + ", App: " + savedPayment.getPaymentApp() + ")");
 
+        // Async Email Notification to Admins
+        try {
+            userRepository.findByRole(com.tiffin.system.entity.enums.RoleType.ROLE_ADMIN).forEach(admin -> {
+                emailService.sendNewPaymentAlertToAdmin(admin.getEmail(), user, savedPayment);
+            });
+        } catch (Exception e) {
+            // graceful non-blocking
+        }
+
         return mapToDto(savedPayment);
     }
 

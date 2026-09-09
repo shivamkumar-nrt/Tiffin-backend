@@ -92,6 +92,15 @@ public class TiffinRequestServiceImpl implements TiffinRequestService {
         auditService.logAction("CREATE_TIFFIN_REQUEST", "TiffinRequest", saved.getId().toString(),
                 currentUserEmail, "Requested " + saved.getTiffinType() + " for " + saved.getServiceDate());
 
+        // Async Email Notification to Admins
+        try {
+            userRepository.findByRole(com.tiffin.system.entity.enums.RoleType.ROLE_ADMIN).forEach(admin -> {
+                emailService.sendNewRequestAlertToAdmin(admin.getEmail(), user, saved);
+            });
+        } catch (Exception e) {
+            // graceful non-blocking
+        }
+
         return mapToDto(saved);
     }
 

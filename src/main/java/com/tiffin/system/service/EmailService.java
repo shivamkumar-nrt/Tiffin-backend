@@ -120,4 +120,51 @@ public class EmailService {
 
         sendEmail(user.getEmail(), "Payment Approved (Rs. " + payment.getAmount() + ") - Receipt", html);
     }
+
+    @Async
+    public void sendNewRequestAlertToAdmin(String adminEmail, User user, TiffinRequest request) {
+        if (adminEmail == null || adminEmail.trim().isEmpty()) return;
+
+        String html = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background: #ffffff;\">"
+                + "<div style=\"background: linear-gradient(135deg, #059669, #0d9488); padding: 15px 20px; border-radius: 8px; color: #ffffff; text-align: center;\">"
+                + "<h2 style=\"margin: 0; font-size: 20px;\">🔔 New Tiffin Order Received</h2>"
+                + "</div>"
+                + "<p style=\"font-size: 15px; color: #334155; margin-top: 20px;\">Hello <b>Admin</b>,</p>"
+                + "<p style=\"color: #475569;\">A new tiffin request has been submitted by customer <b>" + (user != null ? user.getFullName() : "Customer") + "</b>.</p>"
+                + "<div style=\"background: #f8fafc; border-left: 4px solid #059669; padding: 15px; border-radius: 6px; margin: 20px 0;\">"
+                + "<p style=\"margin: 0 0 6px 0;\"><b>Customer Name:</b> " + (user != null ? user.getFullName() : "N/A") + "</p>"
+                + "<p style=\"margin: 0 0 6px 0;\"><b>Phone:</b> " + (user != null && user.getPhone() != null ? user.getPhone() : "N/A") + "</p>"
+                + "<p style=\"margin: 0 0 6px 0;\"><b>Service Date:</b> " + request.getServiceDate() + "</p>"
+                + "<p style=\"margin: 0 0 6px 0;\"><b>Meal Type:</b> " + request.getTiffinType() + "</p>"
+                + (request.getSpecialInstructions() != null ? "<p style=\"margin: 0;\"><b>Instructions:</b> " + request.getSpecialInstructions() + "</p>" : "")
+                + "</div>"
+                + "<p style=\"color: #475569; font-size: 13px;\">Please log into the Admin Console to review and approve this order.</p>"
+                + "<p style=\"font-size: 12px; color: #94a3b8; text-align: center;\">Tiffin Management System &bull; Admin Alert</p>"
+                + "</div>";
+
+        sendEmail(adminEmail, "🔔 New Tiffin Request: " + (user != null ? user.getFullName() : "Customer") + " (" + request.getServiceDate() + ")", html);
+    }
+
+    @Async
+    public void sendNewPaymentAlertToAdmin(String adminEmail, User user, Payment payment) {
+        if (adminEmail == null || adminEmail.trim().isEmpty()) return;
+
+        String html = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background: #ffffff;\">"
+                + "<div style=\"background: linear-gradient(135deg, #0284c7, #0369a1); padding: 15px 20px; border-radius: 8px; color: #ffffff; text-align: center;\">"
+                + "<h2 style=\"margin: 0; font-size: 20px;\">💰 New Payment Submitted (Pending Verification)</h2>"
+                + "</div>"
+                + "<p style=\"font-size: 15px; color: #334155; margin-top: 20px;\">Hello <b>Admin</b>,</p>"
+                + "<p style=\"color: #475569;\">A payment settlement has been submitted by customer <b>" + (user != null ? user.getFullName() : "Customer") + "</b>.</p>"
+                + "<div style=\"background: #f8fafc; border-left: 4px solid #0284c7; padding: 15px; border-radius: 6px; margin: 20px 0;\">"
+                + "<p style=\"margin: 0 0 6px 0;\"><b>Amount Paid:</b> Rs. " + payment.getAmount() + "</p>"
+                + "<p style=\"margin: 0 0 6px 0;\"><b>UTR / Transaction Ref:</b> " + (payment.getTransactionRef() != null ? payment.getTransactionRef() : "N/A") + "</p>"
+                + "<p style=\"margin: 0 0 6px 0;\"><b>Payment App:</b> " + (payment.getPaymentApp() != null ? payment.getPaymentApp() : "UPI") + "</p>"
+                + "<p style=\"margin: 0;\"><b>Customer:</b> " + (user != null ? user.getFullName() + " (" + user.getEmail() + ")" : "N/A") + "</p>"
+                + "</div>"
+                + "<p style=\"color: #475569; font-size: 13px;\">Please check bank account and verify/approve in Admin Console.</p>"
+                + "<p style=\"font-size: 12px; color: #94a3b8; text-align: center;\">Tiffin Management System &bull; Admin Alert</p>"
+                + "</div>";
+
+        sendEmail(adminEmail, "💰 New Payment Submitted: Rs. " + payment.getAmount() + " from " + (user != null ? user.getFullName() : "Customer"), html);
+    }
 }
