@@ -20,6 +20,8 @@ public interface TiffinRecordRepository extends JpaRepository<TiffinRecord, Long
     
     List<TiffinRecord> findByUserIdAndStatus(Long userId, RecordStatus status);
     
+    boolean existsByUserIdAndStatus(Long userId, RecordStatus status);
+    
     List<TiffinRecord> findByServiceDateOrderByCreatedAtDesc(LocalDate serviceDate);
 
     @Query("SELECT COALESCE(SUM(r.chargedAmount), 0) FROM TiffinRecord r WHERE r.user.id = :userId AND r.status = :status")

@@ -164,7 +164,8 @@ public class NotificationBroadcastServiceImpl implements NotificationBroadcastSe
             return getBroadcastHistory();
         }
 
-        return broadcastRepository.findByTargetAudienceOrTargetUserIdOrderByCreatedAtDesc("ALL", user.getId()).stream()
+        boolean hasDues = tiffinRecordRepository.existsByUserIdAndStatus(user.getId(), RecordStatus.UNPAID);
+        return broadcastRepository.findForUser(user.getId(), hasDues).stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
