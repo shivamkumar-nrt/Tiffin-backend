@@ -11,6 +11,7 @@ E:\Tiffin system\backend\src\main\java\com\tiffin\system\controller\DashboardCon
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\controller\HealthController.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\controller\InvoiceController.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\controller\MenuController.java
+E:\Tiffin system\backend\src\main\java\com\tiffin\system\controller\NotificationController.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\controller\PaymentController.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\controller\PriceController.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\controller\TiffinRecordController.java
@@ -20,6 +21,8 @@ E:\Tiffin system\backend\src\main\java\com\tiffin\system\dto\ApiResponse.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\dto\AuditLogDto.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\dto\AuthRequest.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\dto\AuthResponse.java
+E:\Tiffin system\backend\src\main\java\com\tiffin\system\dto\BroadcastNotificationDto.java
+E:\Tiffin system\backend\src\main\java\com\tiffin\system\dto\BroadcastRequest.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\dto\ComboPackageDto.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\dto\CreatePaymentRequest.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\dto\CreateTiffinRequest.java
@@ -39,6 +42,7 @@ E:\Tiffin system\backend\src\main\java\com\tiffin\system\dto\UserDashboardStatsD
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\dto\UserDto.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\dto\UserStatusUpdateRequest.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\entity\AuditLog.java
+E:\Tiffin system\backend\src\main\java\com\tiffin\system\entity\BroadcastNotification.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\entity\ComboPackage.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\entity\enums\ItemCategory.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\entity\enums\PaymentMethod.java
@@ -61,6 +65,7 @@ E:\Tiffin system\backend\src\main\java\com\tiffin\system\exception\BadRequestExc
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\exception\GlobalExceptionHandler.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\exception\ResourceNotFoundException.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\repository\AuditLogRepository.java
+E:\Tiffin system\backend\src\main\java\com\tiffin\system\repository\BroadcastNotificationRepository.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\repository\ComboPackageRepository.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\repository\InvoiceRepository.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\repository\MenuItemRepository.java
@@ -86,6 +91,7 @@ E:\Tiffin system\backend\src\main\java\com\tiffin\system\service\impl\ComboServi
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\service\impl\DashboardServiceImpl.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\service\impl\InvoiceServiceImpl.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\service\impl\MenuServiceImpl.java
+E:\Tiffin system\backend\src\main\java\com\tiffin\system\service\impl\NotificationBroadcastServiceImpl.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\service\impl\PaymentServiceImpl.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\service\impl\PriceServiceImpl.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\service\impl\TiffinRecordServiceImpl.java
@@ -94,6 +100,7 @@ E:\Tiffin system\backend\src\main\java\com\tiffin\system\service\impl\UserServic
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\service\InvoiceService.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\service\KeepAliveScheduler.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\service\MenuService.java
+E:\Tiffin system\backend\src\main\java\com\tiffin\system\service\NotificationBroadcastService.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\service\PaymentReminderScheduler.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\service\PaymentService.java
 E:\Tiffin system\backend\src\main\java\com\tiffin\system\service\PriceService.java
