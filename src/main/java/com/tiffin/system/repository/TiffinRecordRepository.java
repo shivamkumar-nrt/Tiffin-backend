@@ -18,6 +18,8 @@ public interface TiffinRecordRepository extends JpaRepository<TiffinRecord, Long
     
     List<TiffinRecord> findByUserIdOrderByServiceDateDesc(Long userId);
     
+    List<TiffinRecord> findByUserIdOrderByServiceDateAsc(Long userId);
+    
     List<TiffinRecord> findByUserIdAndStatus(Long userId, RecordStatus status);
     
     boolean existsByUserIdAndStatus(Long userId, RecordStatus status);

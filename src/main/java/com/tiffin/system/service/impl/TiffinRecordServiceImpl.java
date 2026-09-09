@@ -37,7 +37,7 @@ public class TiffinRecordServiceImpl implements TiffinRecordService {
     public List<TiffinRecordDto> getMyRecords(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + userEmail));
-        return tiffinRecordRepository.findByUserIdOrderByServiceDateDesc(user.getId()).stream()
+        return tiffinRecordRepository.findByUserIdOrderByServiceDateAsc(user.getId()).stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
