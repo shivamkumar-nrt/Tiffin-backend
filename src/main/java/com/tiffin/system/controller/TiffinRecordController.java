@@ -55,4 +55,12 @@ public class TiffinRecordController {
     public ResponseEntity<ApiResponse<List<TiffinRecordDto>>> getUnpaidRecords(@PathVariable Long userId) {
         return ResponseEntity.ok(ApiResponse.ok(tiffinRecordService.getUnpaidRecordsForUser(userId)));
     }
+
+    @PostMapping("/manual")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<TiffinRecordDto>> addManualRecord(
+            @RequestBody com.tiffin.system.dto.ManualTiffinRecordRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(ApiResponse.ok(tiffinRecordService.addManualRecord(request, userDetails.getUsername())));
+    }
 }

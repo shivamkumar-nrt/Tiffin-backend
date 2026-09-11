@@ -13,4 +13,5 @@ public interface TiffinRecordService {
     List<TiffinRecordDto> getMyRecords(String userEmail);
     List<TiffinRecordDto> getRecordsByDate(LocalDate date);
     List<TiffinRecordDto> getUnpaidRecordsForUser(Long userId);
+    TiffinRecordDto addManualRecord(com.tiffin.system.dto.ManualTiffinRecordRequest request, String adminEmail);
 }

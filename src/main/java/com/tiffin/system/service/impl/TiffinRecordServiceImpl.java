@@ -24,6 +24,8 @@ public class TiffinRecordServiceImpl implements TiffinRecordService {
 
     private final TiffinRecordRepository tiffinRecordRepository;
     private final UserRepository userRepository;
+    private final com.tiffin.system.repository.TiffinRequestRepository tiffinRequestRepository;
+    private final com.tiffin.system.service.AuditService auditService;
 
     @Override
     @Transactional(readOnly = true)
@@ -56,6 +58,43 @@ public class TiffinRecordServiceImpl implements TiffinRecordService {
         return tiffinRecordRepository.findByUserIdAndStatus(userId, RecordStatus.UNPAID).stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public TiffinRecordDto addManualRecord(com.tiffin.system.dto.ManualTiffinRecordRequest request, String adminEmail) {
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        // Create a synthetic approved request
+        com.tiffin.system.entity.TiffinRequest syntheticReq = com.tiffin.system.entity.TiffinRequest.builder()
+                .user(user)
+                .serviceDate(request.getServiceDate())
+                .tiffinType(request.getTiffinType())
+                .status(com.tiffin.system.entity.enums.RequestStatus.APPROVED)
+                .specialInstructions("Manual entry by Admin")
+                .reviewedBy(adminEmail)
+                .reviewedAt(java.time.LocalDateTime.now())
+                .build();
+        
+        syntheticReq = tiffinRequestRepository.save(syntheticReq);
+
+        TiffinRecord record = TiffinRecord.builder()
+                .request(syntheticReq)
+                .user(user)
+                .serviceDate(request.getServiceDate())
+                .tiffinType(request.getTiffinType())
+                .chargedAmount(request.getAmount())
+                .menuSnapshot(request.getMenuSnapshot() != null ? request.getMenuSnapshot() : "Manual Entry")
+                .status(RecordStatus.UNPAID)
+                .build();
+        
+        record = tiffinRecordRepository.save(record);
+        
+        auditService.logAction("ADD_MANUAL_RECORD", "TiffinRecord", record.getId().toString(), adminEmail, 
+                "Manually added tiffin record for user " + user.getEmail() + " on " + request.getServiceDate());
+
+        return mapToDto(record);
     }
 
     private TiffinRecordDto mapToDto(TiffinRecord rec) {
