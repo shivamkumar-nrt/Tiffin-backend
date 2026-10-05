@@ -63,4 +63,13 @@ public class TiffinRecordController {
             @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(ApiResponse.ok(tiffinRecordService.addManualRecord(request, userDetails.getUsername())));
     }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<TiffinRecordDto>> updateRecord(
+            @PathVariable Long id,
+            @RequestBody com.tiffin.system.dto.UpdateTiffinRecordRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(ApiResponse.ok(tiffinRecordService.updateRecord(id, request, userDetails.getUsername())));
+    }
 }

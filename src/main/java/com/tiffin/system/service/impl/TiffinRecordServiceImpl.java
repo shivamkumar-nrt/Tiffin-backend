@@ -97,6 +97,26 @@ public class TiffinRecordServiceImpl implements TiffinRecordService {
         return mapToDto(record);
     }
 
+    @Override
+    @Transactional
+    public TiffinRecordDto updateRecord(Long id, com.tiffin.system.dto.UpdateTiffinRecordRequest request, String adminEmail) {
+        TiffinRecord record = tiffinRecordRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Record not found"));
+
+        if (request.getServiceDate() != null) record.setServiceDate(request.getServiceDate());
+        if (request.getTiffinType() != null) record.setTiffinType(request.getTiffinType());
+        if (request.getAmount() != null) record.setChargedAmount(request.getAmount());
+        if (request.getMenuSnapshot() != null) record.setMenuSnapshot(request.getMenuSnapshot());
+        if (request.getStatus() != null) record.setStatus(request.getStatus());
+
+        record = tiffinRecordRepository.save(record);
+
+        auditService.logAction("UPDATE_TIFFIN_RECORD", "TiffinRecord", record.getId().toString(), adminEmail, 
+                "Admin updated tiffin record");
+
+        return mapToDto(record);
+    }
+
     private TiffinRecordDto mapToDto(TiffinRecord rec) {
         return TiffinRecordDto.builder()
                 .id(rec.getId())

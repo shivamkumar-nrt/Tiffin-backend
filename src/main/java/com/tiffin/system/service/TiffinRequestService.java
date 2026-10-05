@@ -18,4 +18,5 @@ public interface TiffinRequestService {
     Page<TiffinRequestDto> getRequests(Long userId, RequestStatus status, LocalDate startDate, LocalDate endDate, Pageable pageable);
     List<TiffinRequestDto> getMyRequests(String userEmail);
     TiffinRequestDto getRequestById(Long id);
+    TiffinRequestDto updateRequest(Long id, com.tiffin.system.dto.UpdateTiffinRequestRequest request, String adminEmail);
 }

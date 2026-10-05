@@ -86,4 +86,13 @@ public class TiffinRequestController {
         TiffinRequestDto cancelled = tiffinRequestService.cancelRequest(id, userDetails.getUsername());
         return ResponseEntity.ok(ApiResponse.ok("Request cancelled successfully", cancelled));
     }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<TiffinRequestDto>> updateRequest(
+            @PathVariable Long id,
+            @RequestBody com.tiffin.system.dto.UpdateTiffinRequestRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(ApiResponse.ok(tiffinRequestService.updateRequest(id, request, userDetails.getUsername())));
+    }
 }

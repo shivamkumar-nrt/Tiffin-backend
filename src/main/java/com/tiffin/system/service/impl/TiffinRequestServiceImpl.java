@@ -263,6 +263,25 @@ public class TiffinRequestServiceImpl implements TiffinRequestService {
                 .orElseThrow(() -> new ResourceNotFoundException("Request not found with id: " + id));
     }
 
+    @Override
+    @Transactional
+    public TiffinRequestDto updateRequest(Long id, com.tiffin.system.dto.UpdateTiffinRequestRequest dto, String adminEmail) {
+        TiffinRequest request = tiffinRequestRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Request not found"));
+
+        if (dto.getServiceDate() != null) request.setServiceDate(dto.getServiceDate());
+        if (dto.getTiffinType() != null) request.setTiffinType(dto.getTiffinType());
+        if (dto.getSpecialInstructions() != null) request.setSpecialInstructions(dto.getSpecialInstructions());
+        if (dto.getStatus() != null) request.setStatus(dto.getStatus());
+
+        request = tiffinRequestRepository.save(request);
+
+        auditService.logAction("UPDATE_TIFFIN_REQUEST", "TiffinRequest", request.getId().toString(), adminEmail, 
+                "Admin manually updated tiffin request details.");
+
+        return mapToDto(request);
+    }
+
     private TiffinRequestDto mapToDto(TiffinRequest req) {
         String comboName = null;
         if (req.getSpecialInstructions() != null && req.getSpecialInstructions().startsWith("[")) {
